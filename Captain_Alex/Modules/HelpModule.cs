@@ -14,6 +14,8 @@ namespace Captain_Alex.Modules
         [Summary("Lists all commands")]
         public async Task CommandList()
         {
+            if (!CommandHandler.IsPostedInCorrectChannel(Context.Message, GetType().Name))
+                return;
             List<CommandInfo> commands = BotRegistry.CommandService.Commands.ToList();
             var embed = EmbedHandler.getBaseEmbed(Context.User);
             var page = 1;

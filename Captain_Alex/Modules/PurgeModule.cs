@@ -19,6 +19,8 @@ namespace Captain_Alex.Modules
         [Summary("Deletes a specific amount of messages using a bad word filter")]
         public async Task PurgeChannel(int amount = -1)
         {
+            if (!CommandHandler.IsPostedInCorrectChannel(Context.Message, GetType().Name))
+                return;
             var embed = EmbedHandler.getBaseEmbed(Context.User);
             
             if (Context.User is SocketGuildUser user)
@@ -40,6 +42,8 @@ namespace Captain_Alex.Modules
         [Summary("Deletes a specific amount of messages using a bad word filter from all channels")]
         public async Task PurgeAllChannels(int amount = -1)
         {
+            if (!CommandHandler.IsPostedInCorrectChannel(Context.Message, GetType().Name))
+                return;
             var embed = EmbedHandler.getBaseEmbed(Context.User);
             
             if (Context.User is SocketGuildUser user)
