@@ -177,25 +177,24 @@ namespace Captain_Alex.Modules
                     }
                 }
             }
-            
-            //purgeMessages.Add(await channel.SendMessageAsync($"Deleted {deletedMessages} messages!"));
-            
-            var purger = (Context != null) ? Context.User.Id : BotRegistry.Client.CurrentUser.Id;
-            
-            var embed = EmbedHandler.getBaseEmbed(BotRegistry.Client.GetUser(purger));
-            
-            embed.AddField("Purged channel",
-                    $"<#{channel.Id}>")
-                 .AddField("Deleted messages",
-                    $"{deletedMessages}")
-                 .WithTitle("Message Purge");
 
-            ITextChannel logChannel = BotRegistry.Client.Guilds.First().GetTextChannel(GuildRegistry.TC_Logs);
-            await logChannel.SendMessageAsync("", false, embed.Build());
+            if (deletedMessages > 0)
+            {
+                var purger = (Context != null) ? Context.User.Id : BotRegistry.Client.CurrentUser.Id;
+            
+                var embed = EmbedHandler.getBaseEmbed(BotRegistry.Client.GetUser(purger));
+            
+                embed.AddField("Purged channel",
+                        $"<#{channel.Id}>")
+                    .AddField("Deleted messages",
+                        $"{deletedMessages}")
+                    .WithTitle("Message Purge");
+
+                ITextChannel logChannel = BotRegistry.Client.Guilds.First().GetTextChannel(GuildRegistry.TC_Logs);
+                await logChannel.SendMessageAsync("", false, embed.Build());
+            }
             
             await Task.Delay(10000); //rate limit
-            
-            //await ((ITextChannel) channel).DeleteMessagesAsync(purgeMessages);
         }
         
         public static JObject getBadWords()
