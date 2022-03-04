@@ -76,13 +76,14 @@ namespace Captain_Alex.Modules
 
         public async Task DeleteMessages(ITextChannel channel, int amount = -1)
         {
+            Console.WriteLine(channel.Name);
             //var purgeMessages = new List<IMessage>();
             
             //purgeMessages.Add(await channel.SendMessageAsync("Purging bad words..."));
             
             IMessage latestMessage = null;
             var reachedLastMessage = false;
-            var badWords = getBadWords();
+            var badWords = GetBadWords();
             var badMessageIds = new List<ulong>();
             
             do
@@ -94,6 +95,9 @@ namespace Captain_Alex.Modules
                     var messageBulkLimit = (amount <= 100) ? amount : 100;
                     amount -= messageBulkLimit;
                     reachedLastMessage = amount == 0;
+                } else
+                {
+
                 }
                 
                 if (latestMessage == null)
@@ -115,6 +119,19 @@ namespace Captain_Alex.Modules
                     
                     foreach (IMessage message in messages)
                     {
+                        if (GuildRegistry.UnpurgableChannelIdList.Contains(message.Channel.Id))
+                        {
+                            if (messages.Last() == message)
+                            {
+                                reachedLastMessage = true;
+                                break;
+                            } 
+                            else 
+                            { 
+                                continue; 
+                            }
+                        }
+
                         if (message == messages.Last())
                         {
                             latestMessage = message;
@@ -153,8 +170,9 @@ namespace Captain_Alex.Modules
                 }
                 
             } while (!reachedLastMessage);
-            
-            
+
+            if (badMessageIds.Count <= 0) return;
+           
             IList<ulong> tempBadMessageIds = new List<ulong>();
             var counter = 0;
             var deletedMessages = badMessageIds.Count;
@@ -192,12 +210,11 @@ namespace Captain_Alex.Modules
 
                 ITextChannel logChannel = BotRegistry.Client.Guilds.First().GetTextChannel(GuildRegistry.TC_Logs);
                 await logChannel.SendMessageAsync("", false, embed.Build());
+                await Task.Delay(10000); //rate limit
             }
-            
-            await Task.Delay(10000); //rate limit
         }
         
-        public static JObject getBadWords()
+        public static JObject GetBadWords()
         {
             string badWordsString = File.ReadAllText(@"Config\wordfilter.json");
             if (badWordsString == "")
